@@ -1,33 +1,48 @@
+import Basepage.Loginpage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class belajarselenium {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class Logintest {
 
     @Test
-    public void helloJayjay() throws InterruptedException {
+    public void loginpositivecase() throws InterruptedException {
+        // Initialize WebDriver and WebDriverWait
         WebDriver driver = WebDriverManager.chromedriver().create();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        driver.get("https://myzenwel.indociti.com/login?redirect=%2F");
-        driver.findElement(By.xpath("/html/body/div[2]/div[1]/div[1]/form/div/div[2]/div/div[1]/input")).sendKeys("rizwanto.olsera@gmail.com");
-        driver.findElement(By.xpath("/html/body/div[2]/div[1]/div[1]/form/div/div[3]/div/div[1]/input")).sendKeys("admin123");
+        // Navigate to the login page
+        driver.get("https://myzenwel.indociti.com/login?redirect=%2Fdashboard");
 
-        driver.findElement(By.xpath("/html/body/div[2]/div[1]/div[1]/form/div/div[4]/div/button")).click();
+        // Initialize Loginpage object and perform login
+        Loginpage Loginpage = new Loginpage(driver);
+        Loginpage.inputUsername("Rizwanto.olsera@gmail.com");
+        Loginpage.inputPassword("admin123");
+        Loginpage.clickLoginButton();
 
-        // Pause for 10 seconds (10000 milliseconds)
-        Thread.sleep(10000);
+        // Wait for the store list to appear
+        wait.until(ExpectedConditions.visibilityOfElementLocated(Loginpage.getListStoreLocator()));
 
-        // Optionally close the browser manually
+        // Click on a specific store
+        Loginpage.clickSpecificStore(wait);
+
+        // Wait for redirection to the dashboard
+        wait.until(ExpectedConditions.urlToBe("https://myzenwel.indociti.com/dashboard"));
+
+        // Verify redirection
+        assertEquals("https://myzenwel.indociti.com/dashboard", driver.getCurrentUrl(), "Failed to redirect to dashboard");
+
+        // Pause for observation (optional)
+        Thread.sleep(5000);
+
+        // Close the browser
         driver.quit();
-
     }
 }
